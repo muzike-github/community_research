@@ -1,0 +1,21 @@
+列表赋值用append()方法！！！不要用索引
+不能直接把一个列表直接赋值给另一个列表！！！
+用a=b[:]
+字典的max 和min函数：
+    max(dic)返回字典中最大的key值
+    max(dic,key=dic.get)返回字典中最大的value值对应的key
+    get函数得到dic的value值,后面不加（）
+求并集和差集：
+    差集
+    res=list(set(a).difference(set(b)))a中有而b中没有
+    并集
+    res=list(set(a).union(set(b)))
+    交集
+    res=list(set(a).intersection(set(b)))
+sorted函数：
+    a=sorted(list,reverse=True/false)
+    默认升序排列，reverse=True时降序
+
+
+
+    nx.has_path（G,source,target）//判断连个节点是否连通
