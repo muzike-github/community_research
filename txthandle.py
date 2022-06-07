@@ -11,17 +11,19 @@ def graphGenerate():
     while line:
         line = line.strip('\n')
         node = line.split('\t')
+        print(node)
         nodeturple = tuple(node)
         Glist.append(nodeturple)
         line = f.readline()
         t = t + 1
-        if t > 3000:
+        if t > 2000:
             break
     f.close()
+    print(Glist)
     G = nx.Graph()
     G.add_edges_from(Glist)
     return G
 
-# G=graphGenerate()
+G=graphGenerate()
 # nx.draw(G, with_labels=True)
 # plt.show()

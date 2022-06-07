@@ -341,10 +341,10 @@ def BRB(C, R, k1, l, h, H):
     R = reduce1(C, R, h, k1)
     R = reduce2(C, R, h, k1)
     C = reduce3(C, R, h, k1)
-    # print("删除后",C)
     CGraph = nx.subgraph(G, C)
     # 求上界
     UB = min(degreeUperBound(C, R, h), degreeNeighborReconstruct(C, R, h), degreeClassfication(C, R, h))
+    # print("删除后", C)
     if l <= len(C) <= h and MinDegree(CGraph) > k1:
         #print("mindegree",MinDegree(CGraph))
         # 如果找到了更优的C，则更新最优社区H和最小度
