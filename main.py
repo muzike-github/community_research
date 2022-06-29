@@ -3,6 +3,80 @@ import heapq
 import matplotlib.pyplot as plt
 import dataHandle as dh
 import txthandle as th
+import fileHandle as fh
+
+
+# 用于画图的函数
+def paint(GList, H):
+    # 添加加权边
+    G = nx.Graph()
+    G.add_weighted_edges_from(GList)
+    if len(H) != 0:
+        G = G.subgraph(H)
+    # 生成节点位置序列（）
+    pos = nx.circular_layout(G)
+    # 重新获取权重序列
+    weights = nx.get_edge_attributes(G, "weight")
+    # 画节点图
+    nx.draw_networkx(G, pos, with_labels=True)
+    # 画权重图
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=weights)
+    plt.title("BRB")
+    plt.show()
+
+
+# 求图G的最小权重（）
+def minWeight(G):
+    weights = []
+    for i in G:
+        weight = 0
+        for j in nx.neighbors(G, i):  # 遍历节点的所有邻居
+            weight += G.get_edge_data(i, j)['weight']
+        weights.append(weight)
+    return min(weights)
+
+
+# 求图G的最大权重（）
+def maxWeight(G):
+    weights = []
+    for i in G:
+        weight = 0
+        for j in nx.neighbors(G, i):  # 遍历节点的所有邻居
+            weight += G.get_edge_data(i, j)['weight']
+        weights.append(weight)
+    return max(weights)
+
+
+# 根据度数和权重将其归1并计算分数
+def getScore(degree, weight):
+    degreeScore = degree / degreeMax
+    weightScore = weight / weightMax
+    return degreeScore + weightScore
+
+
+# 求图G的最小度
+def minDegree(G):
+    degrees = []
+    for i in G:
+        degrees.append(G.degree(i))
+    return min(degrees)
+
+
+# 求图G的最大度数
+def maxDegree(G):
+    degrees = []
+    for i in G:
+        degrees.append(G.degree(i))
+    return max(degrees)
+
+
+# 求出给定社区的凝聚力分数
+def cohesiveScore(H):
+    degree = MinDegree(nx.subgraph(G, H))
+    weight = minWeight(nx.subgraph(G, H))
+    score = getScore(degree, weight)
+    score = round(score, 4)  # 保留两位小数
+    return score
 
 
 # 自我网络（ego-network）提取算法
@@ -65,7 +139,7 @@ def ConnectScore(C, R):
 # 缩减规则，对实例（C，R）进行缩减
 # 先把与C中每个节点都不相连的顶点从R中删除
 def reduce0(C, R):
-    print("调用reduce0")
+    # print("调用reduce0")
     for v in C:
         for u in R:
             if not G.has_edge(u, v):
@@ -246,11 +320,6 @@ def degreeClassfication(C, R, h):
     return Udc
 
 
-# 度的上界技术测试用例
-# C = [2, 3, 5, 6, 7]
-# R = [0, 1, 4, 8, 9, 10]
-# print(degreeClassfication(C, R, 8))
-
 # 求连接分数最高的节点v*所支配的所有节点集合
 # vx是候选集R中连接分数最高的节点(v*)
 def dominationNodes(C, R, vx):
@@ -274,9 +343,6 @@ def dominationNodes(C, R, vx):
     if vx in dominationList:
         dominationList.remove(vx)  # 将自身移除
     return dominationList
-
-
-#
 
 
 # SC-heu(G,q,l,h)替代贪婪F算法得到一个可行社区H
@@ -316,7 +382,7 @@ def ScHeu(G, q, l, h):
             # 找出G\S中连接分数最大的节点V*
             GexcludeS = list(set(G).difference(set(S)))  # 求G与S的差集
             soreDict = ConnectScore(S, GexcludeS)
-            print(soreDict)
+            # print(soreDict)
             scoreMaxNode = max(soreDict, key=soreDict.get)
             S.append(scoreMaxNode)  # S=S∪{V*}
             sGraph = nx.subgraph(G, S)
@@ -326,8 +392,8 @@ def ScHeu(G, q, l, h):
     if len(H) == 0:
         H.append(q)
     print("基线算法结束,得到的可行社区为:", H)
-    print("初始可行解的顶点数为：",len(H))
-    print("初始可行解的最小度为：",MinDegree(nx.subgraph(G,H)))
+    print("初始可行解的顶点数为：", len(H))
+    print("初始可行解的最小度为：", MinDegree(nx.subgraph(G, H)))
     nx.draw(nx.subgraph(G, H), with_labels=True)
     plt.show()
     return H
@@ -335,7 +401,7 @@ def ScHeu(G, q, l, h):
 
 # BRB算法
 def BRB(C, R, k1, l, h, H):
-    #print(k1)
+    # print(k1)
     # 先用缩减规则对C和R进行处理
     # print("删除前C",C)
     R = reduce1(C, R, h, k1)
@@ -346,16 +412,16 @@ def BRB(C, R, k1, l, h, H):
     UB = min(degreeUperBound(C, R, h), degreeNeighborReconstruct(C, R, h), degreeClassfication(C, R, h))
     # print("删除后", C)
     if l <= len(C) <= h and MinDegree(CGraph) > k1:
-        #print("mindegree",MinDegree(CGraph))
+        # print("mindegree",MinDegree(CGraph))
         # 如果找到了更优的C，则更新最优社区H和最小度
         k1 = MinDegree(CGraph)
-        #print(k1)
+        # print(k1)
         H.clear()
         H = C[:]
         # nx.draw(nx.subgraph(G,H),with_labels=True)
         # plt.show()
-        print("更新：H=", H,"最小度为:",k1)
-    #print("k1",k1)
+        print("更新：H=", H, "最小度为:", k1)
+    # print("k1",k1)
     if len(C) < h and len(R) != 0 and UB > k1:
         scoreDict = ConnectScore(C, R)
         vx = max(scoreDict, key=scoreDict.get)  # 得到连接分数最大的节点 v*
@@ -371,11 +437,11 @@ def BRB(C, R, k1, l, h, H):
             dominationNodesScoreListSorted.append(i[0])
         # 利用分支原理生成i个分支
         for i in dominationNodesScoreListSorted:
-            H,k1=BRB(list(set(C).union({vx, i})), list(set(R).difference({vx, i})), k1, l, h, H)
-        H, k1=BRB(list(set(C).union({vx})), list(set(R).difference({vx}, dominationNodesScoreListSorted)), k1, l, h, H)
-        H, k1=BRB(C, list(set(R).difference({vx}, dominationNodesScoreListSorted)), k1, l, h, H)
+            H, k1 = BRB(list(set(C).union({vx, i})), list(set(R).difference({vx, i})), k1, l, h, H)
+        H, k1 = BRB(list(set(C).union({vx})), list(set(R).difference({vx}, dominationNodesScoreListSorted)), k1, l, h,
+                    H)
+        H, k1 = BRB(C, list(set(R).difference({vx}, dominationNodesScoreListSorted)), k1, l, h, H)
     return H, k1
-
 
 
 # 主算法
@@ -396,32 +462,19 @@ def ScEnum(G, q, l, h):
     return H
 
 
+GList = fh.csvResolve('dataset/bitcoinData.csv')  # 得到测试用图
 G = nx.Graph()
-# 基线方法测试图
-# Glist = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (2, 6), (4, 5), (5, 6), (5, 8), (6, 7), (6, 8),
-#          (6, 10), (7, 9)
-#     , (7, 10), (8, 9), (9, 10)]
-# 缩减规则测试图
-# Glist = [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (1, 4), (2, 3), (2, 5), (2, 7), (3, 4), (4, 5), (4, 6), (4, 9),
-#          (5, 6), (5, 7), (5, 8), (6, 7), (6, 8), (7, 8), (8, 9)]
-# 上界技术和分支技术测试图
-# Glist = [(0, 2), (0, 5), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (3, 5), (3, 6), (4, 5), (5, 6), (5, 7), (5, 9), (6, 9),
-#          (6, 10), (7, 8), (7, 9), (7, 10)]
-# Glist.append((8, 9))
-# Glist.append((9, 10))
-# G.add_edges_from(Glist)
-
-G = th.graphGenerate()  # 得到测试用图
+G.add_weighted_edges_from(GList)
 G.remove_edges_from(nx.selfloop_edges(G))
-# nx.draw(G,with_labels=True)
-# plt.show()
-print("图的节点数为：",len(G.nodes))
-print("图的边数为：",len(G.edges))
-# 5,145,424(3000行)
-H = ScEnum(G, '424', 5, 10)
-print('最优社区H:', H)
-print("最优解的顶点数为：",len(H))
-print("最优解的最小度为：",MinDegree(nx.subgraph(G,H)))
-resultGraph = nx.subgraph(G, H)
-nx.draw(resultGraph, with_labels=True)
-plt.show()
+weightMax = maxWeight(G)
+degreeMax = maxDegree(G)
+print("母图的最大度数", degreeMax)
+print("母图的最大权重", weightMax)
+# 图，查询节点，社区大小上界，社区大小下界
+H = ScEnum(G, 1, 6, 8)
+print("最终社区的最小度为",minDegree(nx.subgraph(G,H)))
+print("最终社区的最大度为",maxDegree(nx.subgraph(G,H)))
+print("最终社区的最小权重为",minWeight(nx.subgraph(G,H)))
+print("最终社区的最大权重为",maxWeight(nx.subgraph(G,H)))
+paint(GList,H)
+print("搜索结果：", H, "凝聚分数", cohesiveScore(H))

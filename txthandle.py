@@ -11,7 +11,7 @@ def graphGenerate():
     while line:
         line = line.strip('\n')
         node = line.split('\t')
-        print(node)
+        # print(node)
         nodeturple = tuple(node)
         Glist.append(nodeturple)
         line = f.readline()
