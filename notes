@@ -16,6 +16,4 @@ sorted函数：
     a=sorted(list,reverse=True/false)
     默认升序排列，reverse=True时降序
 
-
-
     nx.has_path（G,source,target）//判断连个节点是否连通
